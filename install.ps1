@@ -1,18 +1,10 @@
 # install.ps1 — Windows installer for nvim-wezterm-setup
 #
-# INSTALL:
 #   cd ~
 #   Set-ExecutionPolicy Bypass -Scope Process -Force
 #   git clone https://github.com/sirBenhenry/nvim-wezterm-setup
 #   cd nvim-wezterm-setup
 #   .\install.ps1
-#
-# UNINSTALL:
-#   .\install.ps1 -Uninstall
-
-param(
-    [switch]$Uninstall
-)
 
 #Requires -Version 5.1
 $ErrorActionPreference = "Stop"
@@ -54,6 +46,21 @@ function Stop-WithError {
     exit 1
 }
 
+# ── Mode selection ───────────────────────────────────────
+Clear-Host
+Write-Host ""
+Write-Host "  +==========================================+" -ForegroundColor Cyan
+Write-Host "  |         nvim-wezterm-setup               |" -ForegroundColor Cyan
+Write-Host "  |    WezTerm / WSL2 / Ubuntu / Neovim      |" -ForegroundColor Cyan
+Write-Host "  +==========================================+" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "  1) Install" -ForegroundColor White
+Write-Host "  2) Uninstall" -ForegroundColor White
+Write-Host ""
+Write-Host "  ?   What would you like to do? [1/2] " -ForegroundColor Yellow -NoNewline
+$modeChoice = Read-Host
+if ($modeChoice -eq "2") { $Uninstall = $true } else { $Uninstall = $false }
+
 # ══════════════════════════════════════════════════════════
 # UNINSTALL
 # ══════════════════════════════════════════════════════════
@@ -61,7 +68,7 @@ if ($Uninstall) {
     Clear-Host
     Write-Host ""
     Write-Host "  +==========================================+" -ForegroundColor Yellow
-    Write-Host "  |    nvim-wezterm-setup  -  Uninstall      |" -ForegroundColor Yellow
+    Write-Host "  |    nvim-wezterm-setup  -  Uninstall       |" -ForegroundColor Yellow
     Write-Host "  +==========================================+" -ForegroundColor Yellow
     Write-Host ""
     Write-Warn "This will remove the Windows-side config files."
@@ -123,11 +130,9 @@ if ($Uninstall) {
 # ══════════════════════════════════════════════════════════
 # INSTALL
 # ══════════════════════════════════════════════════════════
-Clear-Host
 Write-Host ""
 Write-Host "  +==========================================+" -ForegroundColor Cyan
-Write-Host "  |    nvim-wezterm-setup  -  Windows        |" -ForegroundColor Cyan
-Write-Host "  |    WezTerm / WSL2 / Ubuntu / Neovim      |" -ForegroundColor Cyan
+Write-Host "  |    nvim-wezterm-setup  -  Install         |" -ForegroundColor Cyan
 Write-Host "  +==========================================+" -ForegroundColor Cyan
 Write-Host ""
 Write-Dim "  This installer sets up your Windows terminal environment."
@@ -356,6 +361,6 @@ if ($null -ne (Get-Item "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Star
     Write-Host "  4. Press Ctrl+Alt+K     (keybinding overlay)"
 }
 Write-Host ""
-Write-Dim "  To uninstall: .\install.ps1 -Uninstall"
+Write-Dim "  To uninstall: re-run .\install.ps1 and choose option 2"
 Write-Dim "  Health check (in WSL): bash ~/nvim-wezterm-setup/scripts/health-check.sh"
 Write-Host ""
