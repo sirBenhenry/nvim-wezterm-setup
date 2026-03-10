@@ -271,6 +271,50 @@ if ($weztermFound) {
     Write-Warn "Skipping WezTerm - install it manually from https://wezfurlong.org/wezterm/"
 }
 
+# ── JetBrainsMono Nerd Font ───────────────────────────────
+Write-Step "JetBrainsMono Nerd Font"
+$fontInstalled = (Test-Path "$env:WINDIR\Fonts\JetBrainsMonoNerdFont-Regular.ttf") -or
+                 (Test-Path "$env:LOCALAPPDATA\Microsoft\Windows\Fonts\JetBrainsMonoNerdFont-Regular.ttf")
+
+if ($fontInstalled) {
+    Write-Ok "JetBrainsMono Nerd Font already installed"
+} elseif (Confirm-Step "Install JetBrainsMono Nerd Font? (required for correct display in WezTerm)") {
+    Write-Dim "  Downloading (~25 MB)..."
+    $fontZip = "$env:TEMP\JetBrainsMono.zip"
+    $fontDir = "$env:TEMP\JetBrainsMono-nf"
+    $eap = $ErrorActionPreference; $ErrorActionPreference = "Continue"
+    Invoke-WebRequest -Uri "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip" -OutFile $fontZip -UseBasicParsing
+    $ErrorActionPreference = $eap
+    if (-not (Test-Path $fontZip)) {
+        Write-Warn "Download failed. Install JetBrainsMono Nerd Font manually from https://www.nerdfonts.com/font-downloads"
+    } else {
+        Write-Dim "  Installing..."
+        Expand-Archive -Path $fontZip -DestinationPath $fontDir -Force
+        $userFontDir = "$env:LOCALAPPDATA\Microsoft\Windows\Fonts"
+        New-Item -ItemType Directory -Force -Path $userFontDir | Out-Null
+        $fontReg = "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Fonts"
+        Add-Type -AssemblyName System.Drawing
+        $count = 0
+        Get-ChildItem "$fontDir\JetBrainsMonoNerdFont-*.ttf" | ForEach-Object {
+            $dest = "$userFontDir\$($_.Name)"
+            Copy-Item $_.FullName $dest -Force
+            try {
+                $fc = New-Object System.Drawing.Text.PrivateFontCollection
+                $fc.AddFontFile($dest)
+                $faceName = $fc.Families[0].Name
+                Set-ItemProperty -Path $fontReg -Name "$faceName (TrueType)" -Value $dest -Force
+            } catch {}
+            $count++
+        }
+        Remove-Item $fontZip -Force -ErrorAction SilentlyContinue
+        Remove-Item $fontDir -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Ok "Installed $count font files"
+        Write-Dim "  Restart WezTerm after setup for the font to take effect."
+    }
+} else {
+    Write-Warn "Skipped. WezTerm will show font warnings until JetBrainsMono Nerd Font is installed."
+}
+
 # ── WSL2 + Ubuntu ────────────────────────────────────────
 Write-Step "WSL2 + Ubuntu 24.04"
 
