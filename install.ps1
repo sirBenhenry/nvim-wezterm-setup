@@ -48,12 +48,12 @@ function Stop-WithError {
 
 # Find the installed Ubuntu distro name (could be "Ubuntu" or "Ubuntu-24.04")
 function Get-UbuntuDistro {
-    foreach ($name in @("Ubuntu", "Ubuntu-24.04", "Ubuntu-22.04")) {
-        try {
-            $test = wsl -d $name -e echo "ok" 2>&1
-            if ($test -match "ok") { return $name }
-        } catch {}
-    }
+    try {
+        $list = wsl --list --quiet 2>&1 | ForEach-Object { "$_".Trim() }
+        foreach ($name in @("Ubuntu", "Ubuntu-24.04", "Ubuntu-22.04")) {
+            if ($list -contains $name) { return $name }
+        }
+    } catch {}
     return $null
 }
 
