@@ -278,6 +278,8 @@ prj                   # cd to your projects directory
 cd my-project
 ```
 
+> **Note:** `z` only works for directories you've visited before — zoxide learns from your `cd` history. On a fresh install, use `cd` normally first; `z` gets smarter over time.
+
 ### 3. Open Neovim
 
 ```bash
