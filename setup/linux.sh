@@ -204,15 +204,17 @@ fi
 
 # ── Install bob (Neovim version manager) + Neovim ───────
 say "Neovim"
+export PATH="$HOME/.local/share/bob/nvim-bin:$HOME/.local/bin:$PATH"
+
 if ! command -v bob &>/dev/null; then
   echo "  Installing bob (Neovim version manager)..."
-  cargo_bin="$HOME/.cargo/bin"
-  if ! command -v cargo &>/dev/null; then
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
-    export PATH="$HOME/.cargo/bin:$PATH"
-  fi
-  cargo install bob-nvim 2>&1 | tail -3
-  export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
+  BOB_URL="https://github.com/MordechaiHadad/bob/releases/latest/download/bob-linux-x86_64.zip"
+  curl -fsSL "$BOB_URL" -o /tmp/bob.zip
+  unzip -q /tmp/bob.zip -d /tmp/bob-dl
+  mkdir -p "$HOME/.local/bin"
+  cp /tmp/bob-dl/bob-linux-x86_64/bob "$HOME/.local/bin/bob"
+  rm -rf /tmp/bob.zip /tmp/bob-dl
+  ok "bob installed"
 fi
 
 if ! command -v nvim &>/dev/null; then
@@ -238,7 +240,7 @@ fi
 say "Lazygit"
 if ! command -v lazygit &>/dev/null; then
   echo "  Installing lazygit..."
-  LG_VERSION="$(curl -fsSL https://api.github.com/repos/jesseduffield/lazygit/releases/latest | grep '"tag_name"' | cut -d'"' -f4 | tr -d v)"
+  LG_VERSION="$(curl -fsSL -o /dev/null -w '%{url_effective}' https://github.com/jesseduffield/lazygit/releases/latest | grep -o '[^/]*$' | tr -d v)"
   LG_URL="https://github.com/jesseduffield/lazygit/releases/download/v${LG_VERSION}/lazygit_${LG_VERSION}_Linux_x86_64.tar.gz"
   curl -fsSL "$LG_URL" | tar -xz -C /tmp lazygit
   sudo mv /tmp/lazygit /usr/local/bin/lazygit
