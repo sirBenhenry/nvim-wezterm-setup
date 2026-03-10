@@ -172,6 +172,8 @@ if confirm "Install/update system packages via apt?"; then
     fzf \
     bat \
     zsh \
+    zsh-autosuggestions \
+    zsh-syntax-highlighting \
     python3-pip python3-venv \
     luarocks \
     2>&1 | grep -E '(Installing|Unpacking|newly installed|upgraded)' || true
@@ -458,28 +460,26 @@ fi
 
 # ── Install zsh plugins ──────────────────────────────────
 say "Zsh plugins"
-ZSH_PLUGINS_DIR="$HOME/.zsh"
-mkdir -p "$ZSH_PLUGINS_DIR"
 
-if [[ ! -d "$ZSH_PLUGINS_DIR/fzf-tab" ]]; then
-  git clone --depth=1 https://github.com/Aloxaf/fzf-tab "$ZSH_PLUGINS_DIR/fzf-tab" &>/dev/null
+# fzf-tab: not in apt, clone to ~/.local/share/fzf-tab (path zshrc expects)
+if [[ ! -d "$HOME/.local/share/fzf-tab" ]]; then
+  git clone --depth=1 https://github.com/Aloxaf/fzf-tab "$HOME/.local/share/fzf-tab" &>/dev/null
   ok "fzf-tab installed"
 else
   ok "fzf-tab already installed"
 fi
 
-if [[ ! -d "$ZSH_PLUGINS_DIR/zsh-autosuggestions" ]]; then
-  git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "$ZSH_PLUGINS_DIR/zsh-autosuggestions" &>/dev/null
-  ok "zsh-autosuggestions installed"
+# zsh-autosuggestions and zsh-syntax-highlighting are installed via apt above
+# zshrc sources them from /usr/share/ which is where apt puts them
+if [[ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
+  ok "zsh-autosuggestions ready"
 else
-  ok "zsh-autosuggestions already installed"
+  warn "zsh-autosuggestions not found at /usr/share/ - apt install may have failed"
 fi
-
-if [[ ! -d "$ZSH_PLUGINS_DIR/zsh-syntax-highlighting" ]]; then
-  git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_PLUGINS_DIR/zsh-syntax-highlighting" &>/dev/null
-  ok "zsh-syntax-highlighting installed"
+if [[ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+  ok "zsh-syntax-highlighting ready"
 else
-  ok "zsh-syntax-highlighting already installed"
+  warn "zsh-syntax-highlighting not found at /usr/share/ - apt install may have failed"
 fi
 
 # ── Set zsh as default shell ─────────────────────────────
