@@ -82,9 +82,9 @@ if ($Uninstall) {
     Write-Host "  |    nvim-wezterm-setup  -  Uninstall       |" -ForegroundColor Yellow
     Write-Host "  +==========================================+" -ForegroundColor Yellow
     Write-Host ""
-    Write-Warn "This will remove the Windows-side config files."
-    Write-Dim  "  It does NOT remove WSL, Ubuntu, or anything installed inside WSL."
-    Write-Dim  "  To clean up inside WSL, see the instructions printed at the end."
+    Write-Warn "This will remove nvim-wezterm-setup files and configs."
+    Write-Dim  "  You will be asked about each component separately."
+    Write-Dim  "  Skip anything you want to keep (e.g. if you had WezTerm before this setup)."
     Write-Host ""
 
     if (-not (Confirm-Step "Proceed with uninstall?" $false)) {
@@ -105,6 +105,31 @@ if ($Uninstall) {
         Write-Ok "Removed $weztermCfg"
     } else {
         Write-Dim "  $weztermCfg not found, skipping"
+    }
+
+    # Uninstall WezTerm application
+    Write-Host ""
+    Write-Step "WezTerm application"
+    $weztermInstalled = (Test-Path "$env:LOCALAPPDATA\Programs\WezTerm\wezterm.exe") -or
+                        ($null -ne (Get-Command wezterm -ErrorAction SilentlyContinue))
+    if ($weztermInstalled) {
+        Write-Dim "  WezTerm is currently installed."
+        Write-Dim "  Skip this if you had WezTerm before installing nvim-wezterm-setup."
+        if (Confirm-Step "Uninstall WezTerm?" $false) {
+            $eap = $ErrorActionPreference; $ErrorActionPreference = "Continue"
+            winget uninstall --id wez.wezterm -e 2>&1 | ForEach-Object { Write-Dim "  $_" }
+            $wtExit = $LASTEXITCODE
+            $ErrorActionPreference = $eap
+            if ($wtExit -eq 0) {
+                Write-Ok "WezTerm uninstalled"
+            } else {
+                Write-Warn "winget uninstall failed. Remove WezTerm manually via Settings > Apps."
+            }
+        } else {
+            Write-Dim "  Skipped - WezTerm kept."
+        }
+    } else {
+        Write-Dim "  WezTerm not found, nothing to uninstall."
     }
 
     # Remove config dir
@@ -149,7 +174,9 @@ if ($Uninstall) {
 
     if ($ubuntuReady) {
         if (Confirm-Step "Remove nvim-wezterm-setup files inside Ubuntu?") {
-            wsl -d $ubuntuDistro -u $wslUser -- bash -c "rm -f ~/.zshrc ~/.bashrc ~/.bash_aliases ~/.zshrc.local && rm -f ~/.config/starship.toml && rm -rf ~/.config/nvim ~/.config/nvim-wezterm-setup && rm -rf ~/.local/share/nvim-wezterm-setup && rm -rf ~/nvim-wezterm-setup" 2>&1
+            $eap = $ErrorActionPreference; $ErrorActionPreference = "Continue"
+            wsl -d $ubuntuDistro -u $wslUser -- bash -c "rm -f ~/.zshrc ~/.bashrc ~/.bash_aliases ~/.zshrc.local && rm -f ~/.config/starship.toml && rm -rf ~/.config/nvim ~/.config/nvim-wezterm-setup && rm -rf ~/.local/share/nvim-wezterm-setup && rm -rf ~/nvim-wezterm-setup"
+            $ErrorActionPreference = $eap
             Write-Ok "WSL files removed"
         }
     } else {
@@ -291,7 +318,7 @@ Write-Host ""
 
 $wslUser = ""
 while ($true) {
-    $wslUser = Ask-Question "Your WSL username" "$env:USERNAME".ToLower()
+    $wslUser = Ask-Question "Your WSL username" (("$env:USERNAME".ToLower()) -replace '\s+', '_')
 
     if ($wslUser -match '\s') {
         Write-Fail "Username cannot contain spaces. WSL usernames are like: john, jane, myname"
@@ -345,8 +372,11 @@ Write-Step "Linux installer"
 Write-Dim "  Running setup/linux.sh inside WSL - it will ask you questions."
 Write-Host ""
 if (Confirm-Step "Run the Linux installer now?") {
+    $eap = $ErrorActionPreference; $ErrorActionPreference = "Continue"
     wsl -d $ubuntuDistro -u $wslUser -- bash "$repoWslPath/setup/linux.sh"
-    if ($LASTEXITCODE -ne 0) {
+    $linuxExit = $LASTEXITCODE
+    $ErrorActionPreference = $eap
+    if ($linuxExit -ne 0) {
         Write-Warn "Linux installer exited with an error. Check the output above."
         Write-Warn "You can re-run it inside WSL: bash ~/nvim-wezterm-setup/setup/linux.sh"
     } else {
