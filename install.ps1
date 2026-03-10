@@ -324,7 +324,7 @@ while ($true) {
         Write-Fail "Username cannot contain spaces. WSL usernames are like: john, jane, myname"
         continue
     }
-    if ($wslUser -match '[A-Z]') {
+    if ($wslUser -cmatch '[A-Z]') {
         Write-Warn "Username has uppercase letters - WSL usernames are usually all lowercase."
         if (-not (Confirm-Step "Use '$wslUser' anyway?")) { continue }
     }
@@ -358,9 +358,9 @@ if (Test-Path "$repoWinPath\configs") {
     $repoUrl = Ask-Question "Repo URL to clone" "https://github.com/sirBenhenry/nvim-wezterm-setup"
     Write-Dim "  Cloning into WSL..."
 
-    try {
-        wsl -d $ubuntuDistro -u $wslUser -- git clone $repoUrl $repoWslPath 2>&1 | ForEach-Object { Write-Dim "  $_" }
-    } catch {}
+    $eap = $ErrorActionPreference; $ErrorActionPreference = "Continue"
+    wsl -d $ubuntuDistro -u $wslUser -- git clone $repoUrl $repoWslPath 2>&1 | ForEach-Object { Write-Dim "  $_" }
+    $ErrorActionPreference = $eap
     if (-not (Test-Path "$repoWinPath\configs")) {
         Stop-WithError "Git clone failed. Check the URL and your internet connection."
     }
