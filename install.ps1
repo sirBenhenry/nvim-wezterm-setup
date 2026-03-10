@@ -331,9 +331,10 @@ if (Test-Path "$repoWinPath\configs") {
     $repoUrl = Ask-Question "Repo URL to clone" "https://github.com/sirBenhenry/nvim-wezterm-setup"
     Write-Dim "  Cloning into WSL..."
 
-    $cloneOutput = wsl -d $ubuntuDistro -u $wslUser -- git clone $repoUrl $repoWslPath 2>&1
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host $cloneOutput
+    try {
+        wsl -d $ubuntuDistro -u $wslUser -- git clone $repoUrl $repoWslPath 2>&1 | ForEach-Object { Write-Dim "  $_" }
+    } catch {}
+    if (-not (Test-Path "$repoWinPath\configs")) {
         Stop-WithError "Git clone failed. Check the URL and your internet connection."
     }
     Write-Ok "Repo cloned to $repoWslPath"
