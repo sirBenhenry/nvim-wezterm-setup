@@ -411,7 +411,9 @@ cd ~/nvim-wezterm-setup
 git pull
 cp configs/wezterm.lua /mnt/c/Users/<WindowsUsername>/.wezterm.lua
 
-
-<small>i take no responsibility if i brick your device</small>
 nvim   # then :Lazy sync for plugin updates
 ```
+
+
+
+<small>i take no responsibility if i brick your device</small>
