@@ -356,6 +356,23 @@ config.keys = {
   { key = 'Tab', mods = 'CTRL', action = wezterm.action.ActivateTabRelative(1) },
   { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.ActivateTabRelative(-1) },
 
+  -- Yazi file manager in a new tab at current directory
+  {
+    key = 'y', mods = 'CTRL|SHIFT',
+    action = wezterm.action_callback(function(window, pane)
+      local cwd_uri = pane:get_current_working_dir()
+      local dir = '~'
+      if cwd_uri then
+        local p = cwd_uri.file_path
+        if p then dir = p:gsub('/$', '') end
+      end
+      window:perform_action(wezterm.action.SpawnCommandInNewTab {
+        domain = { DomainName = 'local' },
+        args = { 'wsl.exe', '-d', 'Ubuntu', '--cd', dir, '--', 'yazi' },
+      }, pane)
+    end),
+  },
+
   -- Panes: Ctrl+Shift+H/J/K/L to navigate
   { key = 'd', mods = 'CTRL|SHIFT', action = wezterm.action.SplitHorizontal { domain = 'CurrentPaneDomain' } },
   { key = 'e', mods = 'CTRL|SHIFT', action = wezterm.action.SplitVertical { domain = 'CurrentPaneDomain' } },

@@ -23,6 +23,7 @@ wezterm	Ctrl+Shift+H	Move focus to the left pane	focus pane left navigate move
 wezterm	Ctrl+Shift+J	Move focus to the pane below	focus pane down navigate move
 wezterm	Ctrl+Shift+K	Move focus to the pane above	focus pane up navigate move
 wezterm	Ctrl+Shift+L	Move focus to the right pane	focus pane right navigate move
+wezterm	Ctrl+Shift+Y	Open Yazi file manager in a new tab at current directory	yazi file manager open tab browse
 wezterm	Ctrl+Shift+/	Open keybindings reference menu	help reference keybindings shortcuts menu
 nvim	;	Enter command mode (replaces : without needing Shift)	command mode execute colon swiss qwertz
 nvim	Space /	Search inside the current buffer	search find buffer local pattern text

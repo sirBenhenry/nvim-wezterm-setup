@@ -99,6 +99,7 @@ Open the searchable reference at any time:
 |-----|--------|
 | `Ctrl+Shift+T` | New WSL tab |
 | `Ctrl+Shift+P` | New PowerShell tab |
+| `Ctrl+Shift+Y` | Open Yazi file manager (new tab, current directory) |
 | `Ctrl+1` – `Ctrl+6` | Switch to tab 1–6 |
 | `Ctrl+Tab` | Next tab |
 | `Ctrl+Shift+Tab` | Previous tab |
