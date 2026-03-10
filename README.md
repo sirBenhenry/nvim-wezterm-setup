@@ -410,5 +410,8 @@ Removes Windows-side files, cleans up inside Ubuntu (symlinks, configs), and opt
 cd ~/nvim-wezterm-setup
 git pull
 cp configs/wezterm.lua /mnt/c/Users/<WindowsUsername>/.wezterm.lua
+
+
+<small>i take no responsibility if i brick your device</small>
 nvim   # then :Lazy sync for plugin updates
 ```
