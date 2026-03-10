@@ -400,7 +400,7 @@ cd ~/nvim-wezterm-setup
 # choose option 2 (Uninstall)
 ```
 
-This removes the Windows-side files (WezTerm config, overlay, config dir). It then prints the WSL commands to clean up inside Ubuntu.
+Removes Windows-side files, cleans up inside Ubuntu (symlinks, configs), and optionally unregisters the Ubuntu WSL distro and removes the WSL Windows feature entirely.
 
 ---
 

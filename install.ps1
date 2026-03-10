@@ -114,15 +114,65 @@ if ($Uninstall) {
 
     Write-Host ""
     Write-Ok "Windows-side cleanup done."
+
+    # ── WSL cleanup ──────────────────────────────────────
     Write-Host ""
-    Write-Step "To also clean up inside WSL, run these commands in Ubuntu:"
+    Write-Step "WSL cleanup"
+    Write-Dim "  Running the WSL cleanup removes symlinks and config files inside Ubuntu."
+    Write-Dim "  This does not uninstall tools like nvim, lazygit, etc."
     Write-Host ""
-    Write-Host "  rm -rf ~/nvim-wezterm-setup" -ForegroundColor White
-    Write-Host "  rm ~/.zshrc ~/.bashrc ~/.bash_aliases ~/.zshrc.local" -ForegroundColor White
-    Write-Host "  rm -rf ~/.config/nvim ~/.config/nvim-wezterm-setup ~/.config/starship.toml" -ForegroundColor White
-    Write-Host "  rm -rf ~/.local/share/nvim-wezterm-setup" -ForegroundColor White
+
+    # Detect WSL username from config (may already be deleted above, so check first)
+    $wslUser = $null
+    $wslUserFile = "$env:USERPROFILE\.config\nvim-wezterm-setup\wsl-username"
+    if (Test-Path $wslUserFile) {
+        $wslUser = (Get-Content $wslUserFile -Raw).Trim()
+    }
+    if (-not $wslUser) {
+        $wslUser = Ask-Question "Your WSL username (needed to clean up inside Ubuntu)"
+    }
+
+    $ubuntuReady = $false
+    try {
+        $test = wsl -d Ubuntu -u $wslUser -e echo "ok" 2>&1
+        $ubuntuReady = ($test -match "ok")
+    } catch {}
+
+    if ($ubuntuReady) {
+        if (Confirm-Step "Remove nvim-wezterm-setup files inside Ubuntu?") {
+            wsl -d Ubuntu -u $wslUser -- bash -c "rm -f ~/.zshrc ~/.bashrc ~/.bash_aliases ~/.zshrc.local && rm -f ~/.config/starship.toml && rm -rf ~/.config/nvim ~/.config/nvim-wezterm-setup && rm -rf ~/.local/share/nvim-wezterm-setup && rm -rf ~/nvim-wezterm-setup" 2>&1
+            Write-Ok "WSL files removed"
+        }
+    } else {
+        Write-Warn "Could not reach Ubuntu WSL - clean up manually:"
+        Write-Host "  rm -rf ~/nvim-wezterm-setup" -ForegroundColor White
+        Write-Host "  rm ~/.zshrc ~/.bashrc ~/.bash_aliases ~/.zshrc.local" -ForegroundColor White
+        Write-Host "  rm -rf ~/.config/nvim ~/.config/nvim-wezterm-setup ~/.config/starship.toml" -ForegroundColor White
+        Write-Host "  rm -rf ~/.local/share/nvim-wezterm-setup" -ForegroundColor White
+    }
+
+    # ── Uninstall WSL ─────────────────────────────────────
     Write-Host ""
-    Write-Dim "  (This does not uninstall tools like nvim, lazygit, etc.)"
+    Write-Step "Uninstall WSL (optional)"
+    Write-Warn "This permanently deletes your Ubuntu install and all files inside it."
+    Write-Dim  "  Only do this if you don't use WSL for anything else."
+    Write-Host ""
+    if (Confirm-Step "Uninstall Ubuntu WSL completely?" $false) {
+        Write-Dim "  Unregistering Ubuntu..."
+        wsl --unregister Ubuntu 2>&1 | ForEach-Object { Write-Dim "  $_" }
+        Write-Ok "Ubuntu WSL removed"
+        Write-Dim "  WSL itself (the Windows feature) is still installed."
+        Write-Dim "  To remove it fully, run: wsl --uninstall"
+        if (Confirm-Step "Also remove the WSL Windows feature?" $false) {
+            wsl --uninstall 2>&1 | ForEach-Object { Write-Dim "  $_" }
+            Write-Ok "WSL feature removed (reboot to complete)"
+        }
+    } else {
+        Write-Dim "  Skipped - Ubuntu WSL kept."
+    }
+
+    Write-Host ""
+    Write-Ok "Uninstall complete."
     Write-Host ""
     exit 0
 }
