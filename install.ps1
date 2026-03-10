@@ -1,6 +1,9 @@
 # install.ps1 — Windows installer for nvim-wezterm-setup
 # Run from PowerShell (as Administrator recommended):
+#   cd ~
 #   Set-ExecutionPolicy Bypass -Scope Process -Force
+#   git clone https://github.com/sirBenhenry/nvim-wezterm-setup
+#   cd nvim-wezterm-setup
 #   .\install.ps1
 #
 # What this does:
@@ -39,10 +42,10 @@ function Confirm-Step { param($Prompt, [bool]$DefaultYes = $true)
 # ── Header ───────────────────────────────────────────────
 Clear-Host
 Write-Host ""
-Write-Host "  ╔══════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "  ║     nvim-wezterm-setup  ·  Windows       ║" -ForegroundColor Cyan
-Write-Host "  ║     WezTerm · WSL2 · Ubuntu · Neovim     ║" -ForegroundColor Cyan
-Write-Host "  ╚══════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host "  +==========================================+" -ForegroundColor Cyan
+Write-Host "  |    nvim-wezterm-setup  -  Windows        |" -ForegroundColor Cyan
+Write-Host "  |    WezTerm / WSL2 / Ubuntu / Neovim      |" -ForegroundColor Cyan
+Write-Host "  +==========================================+" -ForegroundColor Cyan
 Write-Host ""
 Write-Dim "  This installer sets up your Windows terminal environment."
 Write-Dim "  It will ask before doing anything significant."
@@ -78,7 +81,7 @@ if ($weztermFound) {
         } catch { $wingetOk = $false }
 
         if (-not $wingetOk) {
-            Write-Dim "  winget failed — downloading installer directly..."
+            Write-Dim "  winget failed - downloading installer directly..."
             $wt_url = "https://github.com/wez/wezterm/releases/latest/download/WezTerm-windows-installer.exe"
             $wt_tmp = "$env:TEMP\wezterm-installer.exe"
             Invoke-WebRequest -Uri $wt_url -OutFile $wt_tmp -UseBasicParsing
@@ -86,7 +89,7 @@ if ($weztermFound) {
             Write-Ok "WezTerm installed"
         }
     } else {
-        Write-Warn "Skipping WezTerm — install it manually from https://wezfurlong.org/wezterm/"
+        Write-Warn "Skipping WezTerm - install it manually from https://wezfurlong.org/wezterm/"
     }
 }
 
@@ -146,7 +149,7 @@ if (Test-Path "$repoWinPath\configs") {
 
 # ── Run Linux installer in WSL ───────────────────────────
 Write-Step "Linux installer"
-Write-Dim "  Running setup/linux.sh inside WSL (interactive — you'll be asked questions)."
+Write-Dim "  Running setup/linux.sh inside WSL (interactive - you'll be asked questions)."
 Write-Host ""
 if (Confirm-Step "Run the Linux installer now?") {
     try {
@@ -196,7 +199,7 @@ if (Confirm-Step "Install the keybinding overlay?" $false) {
         Write-Dim "  To start now, double-click: $startupDir\keybinds-overlay.vbs"
         if (Confirm-Step "Start the overlay now?") {
             Start-Process "wscript.exe" -ArgumentList "`"$startupDir\keybinds-overlay.vbs`""
-            Write-Ok "Overlay started — press Ctrl+Alt+K to open it"
+            Write-Ok "Overlay started - press Ctrl+Alt+K to open it"
         }
     } else {
         Write-Warn "Overlay files not found at $overlayPs1"
@@ -209,16 +212,16 @@ if (Confirm-Step "Install the keybinding overlay?" $false) {
 
 # ── Done ─────────────────────────────────────────────────
 Write-Host ""
-Write-Host "  ╔══════════════════════════════════════════╗" -ForegroundColor Green
-Write-Host "  ║          Installation complete!          ║" -ForegroundColor Green
-Write-Host "  ╚══════════════════════════════════════════╝" -ForegroundColor Green
+Write-Host "  +==========================================+" -ForegroundColor Green
+Write-Host "  |          Installation complete!          |" -ForegroundColor Green
+Write-Host "  +==========================================+" -ForegroundColor Green
 Write-Host ""
 Write-Ok "WezTerm config: $env:USERPROFILE\.wezterm.lua"
 Write-Ok "WSL user:       $wslUser"
 Write-Host ""
 Write-Step "Next steps"
 Write-Host "  1. Open WezTerm (start menu or taskbar)"
-Write-Host "  2. A WSL terminal will open — Neovim and tools are ready"
+Write-Host "  2. A WSL terminal will open - Neovim and tools are ready"
 Write-Host "  3. Press Ctrl+Alt+K to open the keybinding overlay (if installed)"
 Write-Host "  4. Run: theme toggle    (switch between kanagawa/catppuccin)"
 Write-Host "  5. Run: keys            (searchable keybinding reference)"

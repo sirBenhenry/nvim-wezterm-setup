@@ -17,11 +17,14 @@ Installs and configures:
 
 ```powershell
 # From PowerShell (run as Administrator for best results):
+cd ~
 Set-ExecutionPolicy Bypass -Scope Process -Force
 git clone https://github.com/sirBenhenry/nvim-wezterm-setup
 cd nvim-wezterm-setup
 .\install.ps1
 ```
+
+> **Note:** The `cd ~` is important — PowerShell opens in `C:\Windows\System32` by default. Running it from there clones the repo into System32, which is wrong.
 
 The installer guides you through everything interactively. It will:
 1. Install WezTerm
