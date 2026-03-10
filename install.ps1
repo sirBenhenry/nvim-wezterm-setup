@@ -133,7 +133,7 @@ $repoWinPath = "$wslHomePath\nvim-wezterm-setup"
 if (Test-Path "$repoWinPath\configs") {
     Write-Ok "Repo already exists at $repoWslPath"
 } else {
-    $repoUrl = Ask-Question "Repo URL to clone" "https://github.com/YOUR_USERNAME/nvim-wezterm-setup"
+    $repoUrl = Ask-Question "Repo URL to clone" "https://github.com/sirBenhenry/nvim-wezterm-setup"
     Write-Dim "  Cloning into WSL home directory..."
     try {
         wsl -d Ubuntu -u $wslUser -- git clone $repoUrl $repoWslPath 2>&1

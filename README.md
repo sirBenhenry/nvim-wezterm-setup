@@ -18,7 +18,7 @@ Installs and configures:
 ```powershell
 # From PowerShell (run as Administrator for best results):
 Set-ExecutionPolicy Bypass -Scope Process -Force
-git clone https://github.com/YOUR_USERNAME/nvim-wezterm-setup
+git clone https://github.com/sirBenhenry/nvim-wezterm-setup
 cd nvim-wezterm-setup
 .\install.ps1
 ```
