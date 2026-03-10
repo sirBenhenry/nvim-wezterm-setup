@@ -392,6 +392,17 @@ This validates tools, symlinks, configs, and git setup.
 
 ---
 
+## Uninstall
+
+```powershell
+cd ~/nvim-wezterm-setup
+.\install.ps1 -Uninstall
+```
+
+This removes the Windows-side files (WezTerm config, overlay, config dir). It then prints the WSL commands to clean up inside Ubuntu.
+
+---
+
 ## Updating
 
 ```bash
