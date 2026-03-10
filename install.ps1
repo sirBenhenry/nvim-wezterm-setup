@@ -302,15 +302,23 @@ if ($fontInstalled) {
             try {
                 $fc = New-Object System.Drawing.Text.PrivateFontCollection
                 $fc.AddFontFile($dest)
-                $faceName = $fc.Families[0].Name
-                Set-ItemProperty -Path $fontReg -Name "$faceName (TrueType)" -Value $dest -Force
+                $familyName = $fc.Families[0].Name
+                # Include weight/style in key so variants don't overwrite each other
+                $style = [System.IO.Path]::GetFileNameWithoutExtension($_.Name) -replace '^.*-', ''
+                $regKey = if ($style -eq 'Regular') { "$familyName (TrueType)" } else { "$familyName $style (TrueType)" }
+                Set-ItemProperty -Path $fontReg -Name $regKey -Value $dest -Force
             } catch {}
             $count++
         }
         Remove-Item $fontZip -Force -ErrorAction SilentlyContinue
         Remove-Item $fontDir -Recurse -Force -ErrorAction SilentlyContinue
+        # Notify running apps that fonts changed
+        try {
+            Add-Type -TypeDefinition 'using System;using System.Runtime.InteropServices;public class WinFont{[DllImport("user32.dll")]public static extern IntPtr SendMessage(IntPtr h,uint m,IntPtr w,IntPtr l);}' -ErrorAction SilentlyContinue
+            [WinFont]::SendMessage([IntPtr]0xFFFF, 0x001D, [IntPtr]::Zero, [IntPtr]::Zero) | Out-Null
+        } catch {}
         Write-Ok "Installed $count font files"
-        Write-Dim "  Restart WezTerm after setup for the font to take effect."
+        Write-Dim "  Restart WezTerm for the font to take effect."
     }
 } else {
     Write-Warn "Skipped. WezTerm will show font warnings until JetBrainsMono Nerd Font is installed."
