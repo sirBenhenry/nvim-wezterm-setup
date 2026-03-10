@@ -142,9 +142,12 @@ if ($Uninstall) {
     }
 
     # Remove overlay from startup
-    $startupVbs = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\keybinds-overlay.vbs"
+    $startupDir = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup"
+    $startupVbs = "$startupDir\keybinds-overlay.vbs"
+    $startupPs1 = "$startupDir\keybinds-overlay.ps1"
     if (Test-Path $startupVbs) {
         Remove-Item $startupVbs -Force
+        if (Test-Path $startupPs1) { Remove-Item $startupPs1 -Force }
         Write-Ok "Removed overlay from startup"
     } else {
         Write-Dim "  Overlay shortcut not found, skipping"
@@ -415,8 +418,10 @@ if (Confirm-Step "Install the keybinding overlay?" $false) {
     $overlayVbs = "$wslHomePath\nvim-wezterm-setup\overlay\keybinds-overlay-start.vbs"
     $startupDir = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup"
 
-    if (Test-Path $overlayVbs) {
+    $overlayPs1 = "$wslHomePath\nvim-wezterm-setup\overlay\keybinds-overlay.ps1"
+    if ((Test-Path $overlayVbs) -and (Test-Path $overlayPs1)) {
         Copy-Item $overlayVbs "$startupDir\keybinds-overlay.vbs" -Force
+        Copy-Item $overlayPs1 "$startupDir\keybinds-overlay.ps1" -Force
         Write-Ok "Overlay will start automatically on next login"
         if (Confirm-Step "Start the overlay now?") {
             Start-Process "wscript.exe" -ArgumentList "`"$startupDir\keybinds-overlay.vbs`""
