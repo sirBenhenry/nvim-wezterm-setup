@@ -262,7 +262,39 @@ wezterm.on('update-right-status', function(window, pane)
 end)
 
 -- ── Font ─────────────────────────────────────────────────────
-config.font = wezterm.font('JetBrainsMono Nerd Font', { weight = 'Medium' })
+-- Detect font by checking known Windows font file paths.
+local function jetbrains_nf_installed()
+  local appdata = os.getenv('LOCALAPPDATA') or ''
+  local windir  = os.getenv('WINDIR') or 'C:\\Windows'
+  for _, p in ipairs({
+    appdata .. '\\Microsoft\\Windows\\Fonts\\JetBrainsMonoNerdFont-Regular.ttf',
+    windir  .. '\\Fonts\\JetBrainsMonoNerdFont-Regular.ttf',
+  }) do
+    local f = io.open(p, 'r')
+    if f then f:close(); return true end
+  end
+  return false
+end
+
+local font_ok = jetbrains_nf_installed()
+
+if font_ok then
+  config.font = wezterm.font('JetBrainsMono Nerd Font', { weight = 'Medium' })
+else
+  config.font = wezterm.font_with_fallback({ 'Consolas', 'Courier New' })
+  -- Show a toast on startup telling the user to install the font
+  wezterm.on('gui-startup', function(cmd)
+    local tab, pane, window = wezterm.mux.spawn_window(cmd or {})
+    window:toast_notification(
+      'Font not installed',
+      'JetBrainsMono Nerd Font is missing - using Consolas fallback.\n\n'
+        .. 'To fix: open PowerShell in the nvim-wezterm-setup folder and run:\n'
+        .. '    cd ~\\nvim-wezterm-setup; .\\install.ps1',
+      nil,
+      15000
+    )
+  end)
+end
 config.font_size = 11.0
 config.line_height = 1.15
 
