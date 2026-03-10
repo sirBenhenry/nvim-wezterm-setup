@@ -46,6 +46,17 @@ function Stop-WithError {
     exit 1
 }
 
+# Find the installed Ubuntu distro name (could be "Ubuntu" or "Ubuntu-24.04")
+function Get-UbuntuDistro {
+    foreach ($name in @("Ubuntu", "Ubuntu-24.04", "Ubuntu-22.04")) {
+        try {
+            $test = wsl -d $name -e echo "ok" 2>&1
+            if ($test -match "ok") { return $name }
+        } catch {}
+    }
+    return $null
+}
+
 # ── Mode selection ───────────────────────────────────────
 Clear-Host
 Write-Host ""
@@ -80,6 +91,13 @@ if ($Uninstall) {
         Write-Host "Aborted."; exit 0
     }
 
+    # Read WSL username before we delete the config dir
+    $wslUser = $null
+    $wslUserFile = "$env:USERPROFILE\.config\nvim-wezterm-setup\wsl-username"
+    if (Test-Path $wslUserFile) {
+        $wslUser = (Get-Content $wslUserFile -Raw).Trim()
+    }
+
     # Remove WezTerm config
     $weztermCfg = "$env:USERPROFILE\.wezterm.lua"
     if (Test-Path $weztermCfg) {
@@ -109,8 +127,8 @@ if ($Uninstall) {
 
     # Kill overlay process if running
     Get-Process pwsh -ErrorAction SilentlyContinue |
-        Where-Object { $_.CommandLine -like "*keybinds-overlay*" } |
-        ForEach-Object { Stop-Process -Id $_.Id -Force }
+        Where-Object { try { $_.CommandLine -like "*keybinds-overlay*" } catch { $false } } |
+        ForEach-Object { Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue }
 
     Write-Host ""
     Write-Ok "Windows-side cleanup done."
@@ -122,29 +140,20 @@ if ($Uninstall) {
     Write-Dim "  This does not uninstall tools like nvim, lazygit, etc."
     Write-Host ""
 
-    # Detect WSL username from config (may already be deleted above, so check first)
-    $wslUser = $null
-    $wslUserFile = "$env:USERPROFILE\.config\nvim-wezterm-setup\wsl-username"
-    if (Test-Path $wslUserFile) {
-        $wslUser = (Get-Content $wslUserFile -Raw).Trim()
-    }
     if (-not $wslUser) {
         $wslUser = Ask-Question "Your WSL username (needed to clean up inside Ubuntu)"
     }
 
-    $ubuntuReady = $false
-    try {
-        $test = wsl -d Ubuntu -u $wslUser -e echo "ok" 2>&1
-        $ubuntuReady = ($test -match "ok")
-    } catch {}
+    $ubuntuDistro = Get-UbuntuDistro
+    $ubuntuReady = ($null -ne $ubuntuDistro)
 
     if ($ubuntuReady) {
         if (Confirm-Step "Remove nvim-wezterm-setup files inside Ubuntu?") {
-            wsl -d Ubuntu -u $wslUser -- bash -c "rm -f ~/.zshrc ~/.bashrc ~/.bash_aliases ~/.zshrc.local && rm -f ~/.config/starship.toml && rm -rf ~/.config/nvim ~/.config/nvim-wezterm-setup && rm -rf ~/.local/share/nvim-wezterm-setup && rm -rf ~/nvim-wezterm-setup" 2>&1
+            wsl -d $ubuntuDistro -u $wslUser -- bash -c "rm -f ~/.zshrc ~/.bashrc ~/.bash_aliases ~/.zshrc.local && rm -f ~/.config/starship.toml && rm -rf ~/.config/nvim ~/.config/nvim-wezterm-setup && rm -rf ~/.local/share/nvim-wezterm-setup && rm -rf ~/nvim-wezterm-setup" 2>&1
             Write-Ok "WSL files removed"
         }
     } else {
-        Write-Warn "Could not reach Ubuntu WSL - clean up manually:"
+        Write-Warn "Could not reach Ubuntu WSL - clean up manually inside Ubuntu:"
         Write-Host "  rm -rf ~/nvim-wezterm-setup" -ForegroundColor White
         Write-Host "  rm ~/.zshrc ~/.bashrc ~/.bash_aliases ~/.zshrc.local" -ForegroundColor White
         Write-Host "  rm -rf ~/.config/nvim ~/.config/nvim-wezterm-setup ~/.config/starship.toml" -ForegroundColor White
@@ -158,8 +167,9 @@ if ($Uninstall) {
     Write-Dim  "  Only do this if you don't use WSL for anything else."
     Write-Host ""
     if (Confirm-Step "Uninstall Ubuntu WSL completely?" $false) {
-        Write-Dim "  Unregistering Ubuntu..."
-        wsl --unregister Ubuntu 2>&1 | ForEach-Object { Write-Dim "  $_" }
+        $distroToRemove = if ($ubuntuDistro) { $ubuntuDistro } else { "Ubuntu" }
+        Write-Dim "  Unregistering $distroToRemove..."
+        wsl --unregister $distroToRemove 2>&1 | ForEach-Object { Write-Dim "  $_" }
         Write-Ok "Ubuntu WSL removed"
         Write-Dim "  WSL itself (the Windows feature) is still installed."
         Write-Dim "  To remove it fully, run: wsl --uninstall"
@@ -234,25 +244,19 @@ if ($weztermFound) {
 # ── WSL2 + Ubuntu ────────────────────────────────────────
 Write-Step "WSL2 + Ubuntu 24.04"
 
-# Check if Ubuntu already works
-$ubuntuReady = $false
-try {
-    $test = wsl -d Ubuntu -e echo "ok" 2>&1
-    $ubuntuReady = ($test -match "ok")
-} catch {}
+# Check if Ubuntu already works (handles both "Ubuntu" and "Ubuntu-24.04" distro names)
+$ubuntuDistro = Get-UbuntuDistro
+$ubuntuReady = ($null -ne $ubuntuDistro)
 
 if ($ubuntuReady) {
-    Write-Ok "Ubuntu WSL is ready"
+    Write-Ok "Ubuntu WSL is ready ($ubuntuDistro)"
 } elseif (Confirm-Step "Install WSL2 + Ubuntu 24.04?") {
     Write-Dim "  Installing WSL + Ubuntu..."
     wsl --install -d Ubuntu-24.04 2>&1 | ForEach-Object { Write-Dim "  $_" }
 
-    # Check if Ubuntu works now (no reboot needed) or if we need to stop
-    $ubuntuReady = $false
-    try {
-        $test = wsl -d Ubuntu -e echo "ok" 2>&1
-        $ubuntuReady = ($test -match "ok")
-    } catch {}
+    # Check if Ubuntu works now or if a reboot is needed
+    $ubuntuDistro = Get-UbuntuDistro
+    $ubuntuReady = ($null -ne $ubuntuDistro)
 
     if (-not $ubuntuReady) {
         Write-Host ""
@@ -301,7 +305,7 @@ while ($true) {
     # Verify the user actually exists in WSL
     $userExists = $false
     try {
-        $check = wsl -d Ubuntu -u $wslUser -e echo "ok" 2>&1
+        $check = wsl -d $ubuntuDistro -u $wslUser -e echo "ok" 2>&1
         $userExists = ($check -match "ok")
     } catch {}
 
@@ -317,7 +321,7 @@ Write-Ok "WSL username: $wslUser"
 
 # ── Clone repo in WSL ────────────────────────────────────
 Write-Step "Clone nvim-wezterm-setup into WSL"
-$wslHomePath = "\\wsl.localhost\Ubuntu\home\$wslUser"
+$wslHomePath = "\\wsl.localhost\$ubuntuDistro\home\$wslUser"
 $repoWslPath = "/home/$wslUser/nvim-wezterm-setup"
 $repoWinPath = "$wslHomePath\nvim-wezterm-setup"
 
@@ -327,7 +331,7 @@ if (Test-Path "$repoWinPath\configs") {
     $repoUrl = Ask-Question "Repo URL to clone" "https://github.com/sirBenhenry/nvim-wezterm-setup"
     Write-Dim "  Cloning into WSL..."
 
-    $cloneOutput = wsl -d Ubuntu -u $wslUser -- git clone $repoUrl $repoWslPath 2>&1
+    $cloneOutput = wsl -d $ubuntuDistro -u $wslUser -- git clone $repoUrl $repoWslPath 2>&1
     if ($LASTEXITCODE -ne 0) {
         Write-Host $cloneOutput
         Stop-WithError "Git clone failed. Check the URL and your internet connection."
@@ -340,7 +344,7 @@ Write-Step "Linux installer"
 Write-Dim "  Running setup/linux.sh inside WSL - it will ask you questions."
 Write-Host ""
 if (Confirm-Step "Run the Linux installer now?") {
-    wsl -d Ubuntu -u $wslUser -- bash "$repoWslPath/setup/linux.sh"
+    wsl -d $ubuntuDistro -u $wslUser -- bash "$repoWslPath/setup/linux.sh"
     if ($LASTEXITCODE -ne 0) {
         Write-Warn "Linux installer exited with an error. Check the output above."
         Write-Warn "You can re-run it inside WSL: bash ~/nvim-wezterm-setup/setup/linux.sh"
