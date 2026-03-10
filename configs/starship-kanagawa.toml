@@ -1,0 +1,60 @@
+# Starship prompt — Kanagawa woodblock
+# ink · parchment · distant waves
+# Symlinked to ~/.config/starship.toml
+
+format = """$directory$git_branch$git_status$cmd_duration$character"""
+
+[character]
+success_symbol = '[❯](#7E9CD8 bold)'
+error_symbol = '[❯](#C34043 bold)'
+
+[directory]
+truncation_length = 3
+truncation_symbol = '…/'
+style = '#7E9CD8 bold'
+
+[git_branch]
+format = ' [$branch]($style)'
+style = '#727169'
+
+[git_status]
+format = '[$all_status$ahead_behind]($style) '
+style = '#957FB8'
+conflicted = '='
+ahead = '⇡'
+behind = '⇣'
+diverged = '⇕'
+untracked = '?'
+stashed = '\$'
+modified = '!'
+staged = '+'
+deleted = '✘'
+
+[cmd_duration]
+min_time = 2_000
+format = ' [$duration]($style)'
+style = '#C0A36E'
+
+[username]
+disabled = true
+
+[hostname]
+disabled = true
+
+[nodejs]
+disabled = true
+
+[python]
+disabled = true
+
+[rust]
+disabled = true
+
+[golang]
+disabled = true
+
+[java]
+disabled = true
+
+[package]
+disabled = true

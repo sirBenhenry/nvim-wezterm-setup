@@ -1,0 +1,60 @@
+# Starship prompt — Catppuccin Macchiato
+# clean · focused · soft pastels
+# Symlinked to ~/.config/starship.toml when catppuccin theme is active
+
+format = """$directory$git_branch$git_status$cmd_duration$character"""
+
+[character]
+success_symbol = '[❯](#8aadf4 bold)'
+error_symbol = '[❯](#ed8796 bold)'
+
+[directory]
+truncation_length = 3
+truncation_symbol = '…/'
+style = '#8aadf4 bold'
+
+[git_branch]
+format = ' [$branch]($style)'
+style = '#6e738d'
+
+[git_status]
+format = '[$all_status$ahead_behind]($style) '
+style = '#c6a0f6'
+conflicted = '='
+ahead = '⇡'
+behind = '⇣'
+diverged = '⇕'
+untracked = '?'
+stashed = '$'
+modified = '!'
+staged = '+'
+deleted = '✘'
+
+[cmd_duration]
+min_time = 2_000
+format = ' [$duration]($style)'
+style = '#eed49f'
+
+[username]
+disabled = true
+
+[hostname]
+disabled = true
+
+[nodejs]
+disabled = true
+
+[python]
+disabled = true
+
+[rust]
+disabled = true
+
+[golang]
+disabled = true
+
+[java]
+disabled = true
+
+[package]
+disabled = true

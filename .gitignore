@@ -1,0 +1,14 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+.vscode/
+
+# Logs
+*.log
+
+# Generated / state (these live in ~/.config/nvim-wezterm-setup/, not the repo)
+.theme

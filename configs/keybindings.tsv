@@ -1,0 +1,127 @@
+# Keybindings database — single source of truth for the searchable shortcut menu
+# Format: layer	key	description	tags
+# Lines starting with # are section comments (no tabs)
+wezterm	Ctrl+Shift+T	Open a new WSL tab	tab new open wsl terminal
+wezterm	Ctrl+Shift+P	Open a new PowerShell tab	tab new open powershell terminal
+wezterm	Ctrl+1	Switch to tab 1	tab switch goto 1
+wezterm	Ctrl+2	Switch to tab 2	tab switch goto 2
+wezterm	Ctrl+3	Switch to tab 3	tab switch goto 3
+wezterm	Ctrl+4	Switch to tab 4	tab switch goto 4
+wezterm	Ctrl+5	Switch to tab 5	tab switch goto 5
+wezterm	Ctrl+6	Switch to tab 6	tab switch goto 6
+wezterm	Ctrl+7	Switch to tab 7	tab switch goto 7
+wezterm	Ctrl+Tab	Switch to the next tab	tab next switch cycle forward
+wezterm	Ctrl+Shift+Tab	Switch to the previous tab	tab previous switch cycle back
+wezterm	Ctrl+C	Copy selection or send SIGINT if nothing selected	copy yank clipboard sigint interrupt
+wezterm	Ctrl+V	Paste from clipboard	paste insert clipboard
+wezterm	Ctrl+Shift+C	Force copy selection to clipboard	copy force yank clipboard selection
+wezterm	Ctrl+Shift+V	Force paste from clipboard	paste force insert clipboard
+wezterm	Ctrl+Shift+D	Split pane with a vertical divider (new pane on right)	split pane right vertical divide open
+wezterm	Ctrl+Shift+E	Split pane with a horizontal divider (new pane below)	split pane down horizontal divide open
+wezterm	Ctrl+Shift+W	Close the current pane	close pane quit exit
+wezterm	Ctrl+Shift+H	Move focus to the left pane	focus pane left navigate move
+wezterm	Ctrl+Shift+J	Move focus to the pane below	focus pane down navigate move
+wezterm	Ctrl+Shift+K	Move focus to the pane above	focus pane up navigate move
+wezterm	Ctrl+Shift+L	Move focus to the right pane	focus pane right navigate move
+wezterm	Ctrl+Shift+/	Open keybindings reference menu	help reference keybindings shortcuts menu
+nvim	;	Enter command mode (replaces : without needing Shift)	command mode execute colon swiss qwertz
+nvim	Space /	Search inside the current buffer	search find buffer local pattern text
+nvim	Ctrl+H	Move focus to the left split	split focus left navigate window pane
+nvim	Ctrl+J	Move focus to the split below	split focus down navigate window pane
+nvim	Ctrl+K	Move focus to the split above	split focus up navigate window pane
+nvim	Ctrl+L	Move focus to the right split	split focus right navigate window pane
+nvim	Space ww	Cycle focus through all open splits	split cycle window navigate next
+nvim	Space sv	Open a fuzzy-picked file in a new vertical split	split vertical open file fuzzy picker
+nvim	Space sh	Open a fuzzy-picked file in a new horizontal split	split horizontal open file fuzzy picker
+nvim	Ctrl+Up	Resize the current split taller	resize split taller grow bigger vertical
+nvim	Ctrl+Down	Resize the current split shorter	resize split shorter shrink smaller vertical
+nvim	Ctrl+Left	Resize the current split narrower	resize split narrower shrink smaller horizontal
+nvim	Ctrl+Right	Resize the current split wider	resize split wider grow bigger horizontal
+nvim	Shift+H	Switch to the previous buffer	buffer previous back switch navigate
+nvim	Shift+L	Switch to the next buffer	buffer next forward switch navigate
+nvim	Space bd	Close the current buffer	buffer delete close remove
+nvim	Space Space	Fuzzy switch between open buffers	buffer switch fuzzy picker open navigate
+nvim	Space e	Open Yazi file manager at current file location	yazi file manager explorer open browse
+nvim	Space E	Open Yazi file manager at project root (cwd)	yazi file manager explorer root project cwd
+nvim	Space ha	Add current file to Harpoon list	harpoon add mark bookmark file
+nvim	Space hm	Open Harpoon quick-access menu	harpoon menu list open bookmarks
+nvim	Space 1	Jump to Harpoon slot 1	harpoon jump goto file 1 bookmark
+nvim	Space 2	Jump to Harpoon slot 2	harpoon jump goto file 2 bookmark
+nvim	Space 3	Jump to Harpoon slot 3	harpoon jump goto file 3 bookmark
+nvim	Space 4	Jump to Harpoon slot 4	harpoon jump goto file 4 bookmark
+nvim	Space hp	Jump to the previous file in Harpoon list	harpoon previous back file navigate
+nvim	Space hn	Jump to the next file in Harpoon list	harpoon next forward file navigate
+nvim	s	Jump to any visible location using search labels	flash jump teleport navigate goto position label
+nvim	S	Select a treesitter node using flash labels	flash treesitter select node visual label
+nvim	r	Apply a remote flash action on any visible location (operator)	flash remote operator action goto
+nvim	R	Select a treesitter node via flash in operator or visual mode	flash treesitter select operator visual
+nvim	Ctrl+s	Toggle flash label overlay while in search mode	flash search toggle label overlay
+nvim	Space ff	Find files in the project using fuzzy search	find file search fuzzy telescope open picker
+nvim	Space fg	Live grep across all project files	grep search text project live ripgrep
+nvim	Space fb	Browse and switch between open buffers	buffer browse switch fuzzy telescope
+nvim	Space fr	Browse recently opened files	recent files history open browse
+nvim	Space fh	Search Neovim help documentation	help docs search telescope neovim
+nvim	Space fw	Grep for the word under the cursor	grep word cursor search project text
+nvim	Space fp	Browse and open projects in ~/cliwrk/prj/	projects browse open picker cliwrk
+nvim	Space ft	Find all TODO FIXME HACK NOTE comments in project	todo fixme comments find search project
+nvim	gd	Go to the definition of the symbol under the cursor	definition goto jump lsp symbol navigate
+nvim	gr	Show all references to the symbol under the cursor	references list lsp symbol find usages
+nvim	gi	Go to the implementation of the symbol under the cursor	implementation goto jump lsp symbol
+nvim	K	Show hover documentation for the symbol under the cursor	hover docs documentation lsp symbol info
+nvim	Space lr	Rename symbol under cursor across all files	rename refactor lsp symbol all files
+nvim	Space la	Show available code actions at the cursor	code action lsp fix suggest quickfix
+nvim	Space ld	Show diagnostics for the current line in a float	diagnostics error warning line lsp float
+nvim	Space lf	Format the current file	format indent style lint lsp file
+nvim	Space ll	Run linter on current file with interactive UI	lint file python ruff pylint interactive
+nvim	Space lL	Run linter on entire project (all Python files)	lint project all files python ruff pylint
+nvim	Space gs	Stage the git hunk under the cursor	git stage hunk add diff gitsigns
+nvim	Space gr	Reset the git hunk under the cursor to HEAD	git reset hunk revert diff gitsigns
+nvim	Space gS	Stage all changes in the current buffer	git stage all buffer diff add
+nvim	Space gu	Unstage the last staged hunk	git unstage hunk remove diff
+nvim	Space gp	Preview the current git hunk diff inline	git preview hunk diff inline show
+nvim	Space gb	Show git blame annotation for the current line	git blame line author when commit
+nvim	Space gv	Open Diffview for a full diff review	git diff diffview review changes open
+nvim	Space gc	Close Diffview panel	git diffview close panel exit
+nvim	Space gh	Show full git history for the current file	git history log file commits
+nvim	Space gC	Stage all changes and commit with a message prompt	git commit all stage message prompt
+nvim	Space gP	Push the current branch to remote	git push remote branch upload
+nvim	Space gL	Pull the latest changes from remote	git pull remote download sync
+nvim	Space gY	Pull then push to fully sync with remote	git sync pull push remote
+nvim	Space gN	Publish project by creating a GitHub repo and pushing	git publish github create repo push new
+nvim	Space gg	Open Lazygit in a floating terminal	lazygit git ui float terminal open
+nvim	]h	Jump to the next git hunk in the file	git hunk next jump navigate forward
+nvim	[h	Jump to the previous git hunk in the file	git hunk previous jump navigate back
+nvim	:GitStatus	Show git status in a floating window	git status float window show
+nvim	:GitLog	Show git log in a floating window	git log history float window show
+nvim	Space u	Open the undo tree visual history browser	undo history tree visual browser revert
+nvim	Space sr	Open project-wide search and replace (grug-far)	search replace project wide grep substitute
+nvim	ysiw"	Surround the current word with double quotes	surround wrap add quotes word nvim-surround
+nvim	cs'"	Change surrounding single quotes to double quotes	surround change swap quotes nvim-surround
+nvim	ds(	Delete surrounding parentheses	surround delete remove parens nvim-surround
+nvim	vaf	Select around the current function (mini.ai)	select function around text object mini
+nvim	vic	Select inside the current class (mini.ai)	select class inside text object mini
+nvim	Space tt	Toggle linked terminal for current buffer as horizontal split	terminal toggle horizontal split linked buffer
+nvim	Space tf	Toggle linked terminal for current buffer as floating window	terminal toggle float window linked buffer
+nvim	Esc Esc	Hide terminal and return to the source file	terminal hide close return escape source
+nvim	Tab	Accept the next completion item	completion accept next autocomplete suggest
+nvim	Shift+Tab	Accept the previous completion item	completion accept previous autocomplete suggest
+nvim	Ctrl+J	Select the next item in the completion menu	completion next down select navigate
+nvim	Ctrl+K	Select the previous item in the completion menu	completion previous up select navigate
+nvim	Enter	Confirm and insert the selected completion	completion confirm insert accept enter
+nvim	Ctrl+E	Dismiss the completion menu	completion dismiss close cancel escape
+nvim	Ctrl+Space	Manually trigger the completion menu	completion trigger manual open invoke
+nvim	Ctrl+D	Scroll down in the completion documentation preview	completion docs scroll down navigate
+nvim	Ctrl+U	Scroll up in the completion documentation preview	completion docs scroll up navigate
+nvim	Space ta	Toggle between LSP completion (blink) and AI inline (Codeium)	completion toggle ai codeium blink lsp switch
+nvim	Space tv	Toggle inline diagnostic virtual text display	diagnostics toggle virtual text inline show hide
+nvim	Space tz	Toggle Twilight to dim code outside the current block	twilight dim focus toggle code block
+nvim	Space q	Quit all buffers and exit Neovim	quit exit close neovim all buffers
+nvim	Ctrl+S	Save the current file (works in all modes)	save write file all modes
+nvim	Esc	Clear search highlights	search highlight clear escape
+nvim	Space pn	Launch the new project wizard (create dir, git, venv)	project new create wizard directory git venv
+nvim	Space pv	Select a Python virtual environment for the project	venv select python virtual environment project
+nvim	Space ?	Open searchable keybindings reference menu	keybindings help reference search menu shortcuts
+nvim	Space zr	Animate the buffer with a rain cellular automaton effect	rain animation effect fun cellular automaton
+nvim	Space zl	Run Conway's Game of Life on the current buffer	game life conway animation fun
+nvim	:Stats	Open time tracking heatmap for current project	stats time heatmap project tracking
+nvim	:StatsAll	Open global time tracking heatmap across all projects	stats time heatmap global all projects

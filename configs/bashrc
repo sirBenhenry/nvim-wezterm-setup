@@ -1,0 +1,107 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# Managed by nvim-wezterm-setup — edit configs/bashrc, not ~/.bashrc directly.
+#
+# Section A: Ubuntu 24.04 defaults (preserved)
+# Section B: Custom additions (at the end)
+
+# ═══════════════════════════════════════════════════════════
+# Section A — Ubuntu 24.04 defaults
+# ═══════════════════════════════════════════════════════════
+
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+HISTCONTROL=ignoreboth
+shopt -s histappend
+HISTSIZE=1000
+HISTFILESIZE=2000
+shopt -s checkwinsize
+
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+case "$TERM" in
+    xterm-color|*-256color) color_prompt=yes;;
+esac
+
+if [ -n "$force_color_prompt" ]; then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+	color_prompt=yes
+    else
+	color_prompt=
+    fi
+fi
+
+if [ "$color_prompt" = yes ]; then
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+
+case "$TERM" in
+xterm*|rxvt*)
+    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+    ;;
+*)
+    ;;
+esac
+
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias grep='grep --color=auto'
+fi
+
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
+# ═══════════════════════════════════════════════════════════
+# Section B — Custom additions
+# ═══════════════════════════════════════════════════════════
+
+HISTSIZE=10000
+HISTFILESIZE=20000
+HISTTIMEFORMAT="%F %T  "
+HISTCONTROL=ignoreboth:erasedups
+
+# Path additions
+WIN_HOME="${WIN_HOME:-/mnt/c/Users/$USER}"
+export PATH="$WIN_HOME/bin:$PATH"     # win32yank for Neovim clipboard
+export PATH="$HOME/.local/bin:$PATH"
+
+export EDITOR=nvim
+export VISUAL=nvim
+
+if command -v zoxide &>/dev/null; then
+  eval "$(zoxide init bash)"
+fi
+
+if command -v fzf &>/dev/null; then
+  [ -f /usr/share/doc/fzf/examples/key-bindings.bash ] && source /usr/share/doc/fzf/examples/key-bindings.bash
+  [ -f /usr/share/bash-completion/completions/fzf ] && source /usr/share/bash-completion/completions/fzf
+fi
+
+if command -v starship &>/dev/null; then
+  eval "$(starship init bash)"
+fi
+
+unset color_prompt force_color_prompt
