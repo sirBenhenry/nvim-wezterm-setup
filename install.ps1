@@ -227,6 +227,7 @@ Write-Host "  +==========================================+" -ForegroundColor Cya
 Write-Host ""
 Write-Dim "  This installer sets up your Windows terminal environment."
 Write-Dim "  It will ask before doing anything significant."
+Write-Dim "  Safe to re-run at any time — if something gets stuck, press Ctrl+C and run it again."
 Write-Host ""
 
 # ── Check elevation ──────────────────────────────────────
@@ -325,6 +326,9 @@ $ubuntuReady = ($null -ne $ubuntuDistro)
 if ($ubuntuReady) {
     Write-Ok "Ubuntu WSL is ready ($ubuntuDistro)"
 } elseif (Confirm-Step "Install WSL2 + Ubuntu 24.04?") {
+    Write-Dim "  Note: WSL may require up to 2 reboots on a fresh system."
+    Write-Dim "  After each reboot, re-run this installer — it will continue from where it left off."
+    Write-Host ""
     Write-Dim "  Installing WSL + Ubuntu..."
     wsl --install -d Ubuntu-24.04 2>&1 | ForEach-Object { Write-Dim "  $_" }
 
@@ -339,6 +343,7 @@ if ($ubuntuReady) {
         Write-Host "  +------------------------------------------+" -ForegroundColor Yellow
         Write-Host ""
         Write-Warn "WSL was installed but needs a reboot to activate."
+        Write-Warn "A second reboot may sometimes be needed — just reboot and re-run until it passes."
         Write-Host ""
         Write-Host "  After rebooting, do these steps in order:" -ForegroundColor White
         Write-Host "  1. Open 'Ubuntu' from the Start Menu" -ForegroundColor White
@@ -347,6 +352,7 @@ if ($ubuntuReady) {
         Write-Host "     -> Set a password, then close that window" -ForegroundColor DarkGray
         Write-Host "  2. Open PowerShell and run:" -ForegroundColor White
         Write-Host "     cd $PSScriptRoot" -ForegroundColor Cyan
+        Write-Host "     Set-ExecutionPolicy Bypass -Scope Process -Force" -ForegroundColor Cyan
         Write-Host "     .\install.ps1" -ForegroundColor Cyan
         Write-Host ""
         exit 0
@@ -361,6 +367,7 @@ if ($ubuntuReady) {
 Write-Step "WSL username"
 Write-Dim "  This is the username you created when Ubuntu first set up."
 Write-Dim "  It must be lowercase with no spaces (e.g. john, not John Smith)."
+Write-Dim "  The value in [brackets] is pre-filled — press Enter to accept it."
 Write-Host ""
 
 $wslUser = ""
@@ -402,6 +409,7 @@ $repoWinPath = "$wslHomePath\nvim-wezterm-setup"
 if (Test-Path "$repoWinPath\configs") {
     Write-Ok "Repo already exists at $repoWslPath"
 } else {
+    Write-Dim "  Press Enter to clone from the official repo, or type a different URL."
     $repoUrl = Ask-Question "Repo URL to clone" "https://github.com/sirBenhenry/nvim-wezterm-setup"
     Write-Dim "  Cloning into WSL..."
 
@@ -416,7 +424,9 @@ if (Test-Path "$repoWinPath\configs") {
 
 # ── Run Linux installer in WSL ───────────────────────────
 Write-Step "Linux installer"
-Write-Dim "  Running setup/linux.sh inside WSL - it will ask you questions."
+Write-Dim "  This installs tools inside Ubuntu (neovim, starship, lazygit, etc.)."
+Write-Dim "  It runs interactively and takes a few minutes — answer the prompts as they appear."
+Write-Dim "  If it gets stuck, press Ctrl+C and re-run install.ps1 — it will resume safely."
 Write-Host ""
 if (Confirm-Step "Run the Linux installer now?") {
     $eap = $ErrorActionPreference; $ErrorActionPreference = "Continue"
