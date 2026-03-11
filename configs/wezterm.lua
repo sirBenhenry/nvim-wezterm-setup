@@ -27,7 +27,9 @@ local function read_theme()
 
   local paths = {}
   if wsl_user then
-    table.insert(paths, '\\\\wsl.localhost\\Ubuntu\\home\\' .. wsl_user .. '\\.config\\nvim-wezterm-setup\\theme')
+    for _, distro in ipairs({ 'Ubuntu', 'Ubuntu-24.04', 'Ubuntu-22.04' }) do
+      table.insert(paths, '\\\\wsl.localhost\\' .. distro .. '\\home\\' .. wsl_user .. '\\.config\\nvim-wezterm-setup\\theme')
+    end
   end
   table.insert(paths, wezterm.home_dir .. '/.config/nvim-wezterm-setup/theme')
 
@@ -366,7 +368,7 @@ config.keys = {
     key = 't', mods = 'CTRL|SHIFT',
     action = wezterm.action.SpawnCommandInNewTab {
       domain = { DomainName = 'local' },
-      args = { 'wsl.exe', '-d', 'Ubuntu', '--cd', '~' },
+      args = { 'wsl.exe', '--cd', '~' },
     },
   },
   {
@@ -400,7 +402,7 @@ config.keys = {
       end
       window:perform_action(wezterm.action.SpawnCommandInNewTab {
         domain = { DomainName = 'local' },
-        args = { 'wsl.exe', '-d', 'Ubuntu', '--cd', dir, '--', 'yazi' },
+        args = { 'wsl.exe', '--cd', dir, '--', 'yazi' },
       }, pane)
     end),
   },
