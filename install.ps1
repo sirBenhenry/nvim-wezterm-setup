@@ -353,7 +353,9 @@ if ($ubuntuReady) {
     Write-Host ""
     Write-Dim "  Installing WSL + Ubuntu (this can take several minutes - progress shown below)..."
     Write-Host ""
+    $eap = $ErrorActionPreference; $ErrorActionPreference = "Continue"
     wsl --install -d Ubuntu-24.04
+    $ErrorActionPreference = $eap
 
     # Check if Ubuntu works now or if a reboot is needed
     $ubuntuDistro = Get-UbuntuDistro
