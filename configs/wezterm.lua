@@ -333,13 +333,13 @@ config.tab_bar_at_bottom = false
 config.tab_max_width = 32
 
 -- ── Default shell ────────────────────────────────────────────
--- Opens WSL Ubuntu by default. Change 'Ubuntu' to your distro name if different.
+-- Opens the default WSL distro. No -d flag so it works regardless of distro name.
 config.default_domain = 'local'
-config.default_prog = { 'wsl.exe', '-d', 'Ubuntu', '--cd', '~' }
+config.default_prog = { 'wsl.exe', '--cd', '~' }
 
 -- ── Launch menu ──────────────────────────────────────────────
 config.launch_menu = {
-  { label = 'WSL: Ubuntu', args = { 'wsl.exe', '-d', 'Ubuntu' } },
+  { label = 'WSL',         args = { 'wsl.exe', '--cd', '~' } },
   { label = 'PowerShell',  args = { 'pwsh.exe' } },
   { label = 'CMD',         args = { 'cmd.exe' } },
 }
