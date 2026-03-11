@@ -36,6 +36,22 @@ function Confirm-Step {
     return $ans -match '^[Yy]'
 }
 
+function Invoke-Download {
+    param($Uri, $OutFile, $Label = "")
+    if ($Label) { Write-Dim "  Downloading $Label..." }
+    # Try BITS first (native Windows progress bar + background transfer)
+    try {
+        Import-Module BitsTransfer -ErrorAction Stop
+        Start-BitsTransfer -Source $Uri -Destination $OutFile -DisplayName $Label -ErrorAction Stop
+        return
+    } catch {}
+    # Fallback: Invoke-WebRequest with built-in progress
+    $prev = $ProgressPreference
+    $ProgressPreference = 'Continue'
+    Invoke-WebRequest -Uri $Uri -OutFile $OutFile -UseBasicParsing
+    $ProgressPreference = $prev
+}
+
 function Stop-WithError {
     param($Message)
     Write-Host ""
@@ -261,10 +277,9 @@ if ($weztermFound) {
     } catch {}
 
     if (-not $wingetOk) {
-        Write-Dim "  Downloading installer directly..."
         $wt_url = "https://github.com/wez/wezterm/releases/latest/download/WezTerm-windows-installer.exe"
         $wt_tmp = "$env:TEMP\wezterm-installer.exe"
-        Invoke-WebRequest -Uri $wt_url -OutFile $wt_tmp -UseBasicParsing
+        Invoke-Download -Uri $wt_url -OutFile $wt_tmp -Label "WezTerm installer (~25 MB)"
         Start-Process $wt_tmp -ArgumentList "/S" -Wait
         Write-Ok "WezTerm installed"
     }
@@ -280,11 +295,10 @@ $fontInstalled = (Test-Path "$env:WINDIR\Fonts\JetBrainsMonoNerdFont-Regular.ttf
 if ($fontInstalled) {
     Write-Ok "JetBrainsMono Nerd Font already installed"
 } elseif (Confirm-Step "Install JetBrainsMono Nerd Font? (required for correct display in WezTerm)") {
-    Write-Dim "  Downloading (~25 MB)..."
     $fontZip = "$env:TEMP\JetBrainsMono.zip"
     $fontDir = "$env:TEMP\JetBrainsMono-nf"
     $eap = $ErrorActionPreference; $ErrorActionPreference = "Continue"
-    Invoke-WebRequest -Uri "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip" -OutFile $fontZip -UseBasicParsing
+    Invoke-Download -Uri "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip" -OutFile $fontZip -Label "JetBrainsMono Nerd Font (~25 MB)"
     $ErrorActionPreference = $eap
     if (-not (Test-Path $fontZip)) {
         Write-Warn "Download failed. Install JetBrainsMono Nerd Font manually from https://www.nerdfonts.com/font-downloads"
@@ -337,8 +351,9 @@ if ($ubuntuReady) {
     Write-Dim "  Note: WSL may require up to 2 reboots on a fresh system."
     Write-Dim "  After each reboot, re-run this installer  -  it will continue from where it left off."
     Write-Host ""
-    Write-Dim "  Installing WSL + Ubuntu..."
-    wsl --install -d Ubuntu-24.04 2>&1 | ForEach-Object { Write-Dim "  $_" }
+    Write-Dim "  Installing WSL + Ubuntu (this can take several minutes - progress shown below)..."
+    Write-Host ""
+    wsl --install -d Ubuntu-24.04
 
     # Check if Ubuntu works now or if a reboot is needed
     $ubuntuDistro = Get-UbuntuDistro

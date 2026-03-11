@@ -182,7 +182,9 @@ if confirm "Install/update system packages via apt?"; then
   if ! command -v eza &>/dev/null; then
     warn "eza not found in apt — installing from GitHub release..."
     EZA_URL="https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz"
-    curl -fsSL "$EZA_URL" | tar -xz -C /tmp
+    curl -fL --progress-bar "$EZA_URL" -o /tmp/eza.tar.gz
+    tar -xz -C /tmp -f /tmp/eza.tar.gz
+    rm -f /tmp/eza.tar.gz
     sudo mv /tmp/eza /usr/local/bin/eza
   fi
 
@@ -209,7 +211,7 @@ export PATH="$HOME/.local/share/bob/nvim-bin:$HOME/.local/bin:$PATH"
 if ! command -v bob &>/dev/null; then
   echo "  Installing bob (Neovim version manager)..."
   BOB_URL="https://github.com/MordechaiHadad/bob/releases/latest/download/bob-linux-x86_64.zip"
-  curl -fsSL "$BOB_URL" -o /tmp/bob.zip
+  curl -fL --progress-bar "$BOB_URL" -o /tmp/bob.zip
   unzip -q /tmp/bob.zip -d /tmp/bob-dl
   mkdir -p "$HOME/.local/bin"
   cp /tmp/bob-dl/bob-linux-x86_64/bob "$HOME/.local/bin/bob"
@@ -242,7 +244,9 @@ if ! command -v lazygit &>/dev/null; then
   echo "  Installing lazygit..."
   LG_VERSION="$(curl -fsSL -o /dev/null -w '%{url_effective}' https://github.com/jesseduffield/lazygit/releases/latest | grep -o '[^/]*$' | tr -d v)"
   LG_URL="https://github.com/jesseduffield/lazygit/releases/download/v${LG_VERSION}/lazygit_${LG_VERSION}_Linux_x86_64.tar.gz"
-  curl -fsSL "$LG_URL" | tar -xz -C /tmp lazygit
+  curl -fL --progress-bar "$LG_URL" -o /tmp/lazygit.tar.gz
+  tar -xz -C /tmp lazygit -f /tmp/lazygit.tar.gz
+  rm -f /tmp/lazygit.tar.gz
   sudo mv /tmp/lazygit /usr/local/bin/lazygit
   ok "Lazygit installed"
 else
@@ -256,7 +260,7 @@ if confirm "Install yazi?" y; then
   if ! command -v yazi &>/dev/null; then
     echo "  Installing yazi..."
     YAZI_URL="https://github.com/sxyazi/yazi/releases/latest/download/yazi-x86_64-unknown-linux-gnu.zip"
-    curl -fsSL "$YAZI_URL" -o /tmp/yazi.zip
+    curl -fL --progress-bar "$YAZI_URL" -o /tmp/yazi.zip
     unzip -q /tmp/yazi.zip -d /tmp/yazi-dl
     mkdir -p "$HOME/.local/bin"
     cp /tmp/yazi-dl/*/yazi "$HOME/.local/bin/yazi"
@@ -275,8 +279,7 @@ if ! command -v win32yank.exe &>/dev/null; then
   if [ -d "$WIN_HOME" ]; then
     mkdir -p "$WIN32YANK_DIR"
     W32Y_URL="https://github.com/equalsraf/win32yank/releases/latest/download/win32yank-x64.zip"
-    echo "  Downloading win32yank.exe to $WIN32YANK_DIR..."
-    curl -fsSL "$W32Y_URL" -o /tmp/win32yank.zip
+    curl -fL --progress-bar "$W32Y_URL" -o /tmp/win32yank.zip
     unzip -q -o /tmp/win32yank.zip win32yank.exe -d "$WIN32YANK_DIR"
     rm /tmp/win32yank.zip
     ok "win32yank installed to $WIN32YANK_DIR"
