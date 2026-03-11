@@ -85,8 +85,9 @@ HISTCONTROL=ignoreboth:erasedups
 
 # Path additions
 WIN_HOME="${WIN_HOME:-/mnt/c/Users/$USER}"
-export PATH="$WIN_HOME/bin:$PATH"     # win32yank for Neovim clipboard
+export PATH="$WIN_HOME/bin:$PATH"                    # win32yank for Neovim clipboard
 export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"  # bob-managed neovim
 
 export EDITOR=nvim
 export VISUAL=nvim
