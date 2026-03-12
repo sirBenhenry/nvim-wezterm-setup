@@ -432,7 +432,11 @@ $repoWslPath = "/home/$wslUser/nvim-wezterm-setup"
 $repoWinPath = "$wslHomePath\nvim-wezterm-setup"
 
 if (Test-Path "$repoWinPath\configs") {
-    Write-Ok "Repo already exists at $repoWslPath"
+    Write-Dim "  Repo exists - pulling latest changes..."
+    $eap = $ErrorActionPreference; $ErrorActionPreference = "Continue"
+    wsl -d $ubuntuDistro -u $wslUser -- git -C $repoWslPath pull 2>&1 | ForEach-Object { Write-Dim "  $_" }
+    $ErrorActionPreference = $eap
+    Write-Ok "Repo up to date at $repoWslPath"
 } else {
     Write-Dim "  Press Enter to clone from the official repo, or type a different URL."
     $repoUrl = Ask-Question "Repo URL to clone" "https://github.com/sirBenhenry/nvim-wezterm-setup"
